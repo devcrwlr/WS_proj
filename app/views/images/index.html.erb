@@ -1,0 +1,200 @@
+<p id="notice"><%= notice %></p>
+
+<% uniqAlbum = [] %>
+<% uniqSinger = [] %>
+<% uniqMultipleSinger = [] %>
+
+<% require 'mechanize' %>
+<% require 'rubygems' %>
+<% require 'ImageResize' %>
+<% require 'fileutils' %>
+<% require 'rubyXL' %>
+<% require 'nokogiri' %>
+
+<% if $songandsingerlist != nil %>
+
+    <% $songandsingerlist.each_with_index do |songandsinger,index| %>
+        <% thealbum = songandsinger["album_name"] %>
+        <% thesinger = songandsinger["singer_name"] %>
+        <% imageSinger = songandsinger["image_singer"] %>
+
+      <% imageHash = {} %>
+      <% infoHash = {} %>
+
+        <% unless uniqAlbum.to_s.include? "#{thealbum}"%>
+            <% unless "#{thealbum}" == "N/A" %>
+              <% uniqAlbum << songandsinger %>
+            <% end %>
+        <% end %>
+        <% unless uniqSinger.to_s.include? "#{thesinger}" %>
+          <% unless "#{imageSinger}" == "N/A" %>
+            <% if thesinger.to_s.include? "&" %>
+              <% uniqMultipleSinger << songandsinger %>
+            <% else %>
+              <% uniqSinger << songandsinger %>
+            <% end %>
+          <% end %>
+        <% end %>
+
+      <% end %>
+      <% end %>
+<% "getUniqSong #{uniqAlbum.uniq}"%><br>
+<% "getUniqSinger #{uniqSinger.uniq}"%><br>
+<% "get Multiple Singer #{uniqMultipleSinger.uniq}"%>
+
+<h1>Generate Excel Files and Download Images </h1>
+
+<% def downloadimage(info,img_link,imgName,originalName) %>
+    <% begin%>
+    <% mechanize = Mechanize.new %>
+    <% mechanize.get(img_link).save "tmp/#{info}#{imgName}.jpg" %>
+    <% Image.resize("tmp/#{info}#{imgName}.jpg","tmp/#{info}#{imgName}.jpg", 500, 500) %>
+    <% FileUtils.mv("tmp/#{info}#{imgName}.jpg", "#{$directory_info}/#{originalName}.jpg") %>
+    <% rescue => error %>
+      <%= "Unable to download Image" %>
+    <% end %>
+<% end %>
+
+<% def generateExcelFiles(info,path,songandsinger) %>
+
+  <% album_count = Hash.new(0) %>
+  <% $albumlist.each do |v| %>
+    <% album_count[v] += 1 %>
+  <% end %>
+
+  <% theindex =  songandsinger["index"] %>
+  <% thecounter =  songandsinger["counter"] %>
+  <% thesong =  songandsinger["song_name"] %>
+  <% thesinger = songandsinger["singer_name"] %>
+  <% thealbum = songandsinger["album_name"] %>
+  <% thelanguage = songandsinger["language"] %>
+  <% theoriginofsinger = songandsinger["origin_of_singer"] %>
+  <% thereleasetimeofalbum = songandsinger["release_time_of_album"] %>
+  <% thereleasecompanyofalbum = songandsinger["release_company_of_album"] %>
+  <% thealbumtype = songandsinger["album_type"] %>
+  <% thealbumcomposition = songandsinger["album_composition"] %>
+  <% thegenreofsong = songandsinger["genre_of_song"] %>
+  <% thealbumintro = songandsinger["album_intro"] %>
+  <% thegenderofsinger = songandsinger["gender_of_singer"] %>
+  <% thebirthday = songandsinger["birthday"] %>
+  <% thedateofdeath = songandsinger["date_of_death"] %>
+  <% therecordlabelforsinger = songandsinger["record_label_for_singer"] %>
+  <% thegenreofsinger = songandsinger["genre_of_singer"] %>
+  <% thesingerintro = songandsinger["singer_intro"] %>
+  <% imageAlbum = songandsinger["image_album"] %>
+  <% imageSinger = songandsinger["image_singer"] %>
+
+  <% if info == "SingerInfo" %>
+    <% FileUtils.cp("tmp/SingerInfo.xlsx", path) %>
+    <% workbook = RubyXL::Parser.parse(path) %>
+    <% worksheet = workbook.worksheets[0] %>
+    <% worksheet.insert_cell(2, 0, "#{thesinger}") %>
+    <% worksheet.insert_cell(2, 1, "#{thegenderofsinger}") %>
+    <% worksheet.insert_cell(2, 2, "#{theoriginofsinger}") %>
+    <% worksheet.insert_cell(2, 3, "#{thebirthday}") %>
+    <% worksheet.insert_cell(2, 4, "#{thedateofdeath}") %>
+    <% worksheet.insert_cell(2, 5, "#{therecordlabelforsinger}") %>
+    <% worksheet.insert_cell(2, 6, "#{thegenreofsinger}") %>
+    <% worksheet.insert_cell(2, 7, "#{thesingerintro}") %>
+    <% workbook.write(path) %>
+
+  <% elsif info == "MultipleSingerInfo" %>
+
+    <% FileUtils.cp("tmp/SingerInfo.xlsx", path) %>
+    <% imgName = thesinger.split("&")%>
+    <% workbook = RubyXL::Parser.parse(path) %>
+    <% worksheet = workbook.worksheets[0] %>
+    <% imgName.each_with_index do |img,index| %>
+      <% rows = (2+index) %>
+      <% thesingerintro.gsub!(/[”“]/, '"') %>
+      <% thesingerintro.gsub!(/[‘’]/, "'") %>
+      <% worksheet.insert_cell(rows, 0, "#{img}") %>
+      <% worksheet.insert_cell(rows, 1, "#{thegenderofsinger}") %>
+      <% worksheet.insert_cell(rows, 2, "#{theoriginofsinger}") %>
+      <% worksheet.insert_cell(rows, 3, "#{thebirthday}") %>
+      <% worksheet.insert_cell(rows, 4, "#{thedateofdeath}") %>
+      <% worksheet.insert_cell(rows, 5, "#{therecordlabelforsinger}") %>
+      <% worksheet.insert_cell(rows, 6, "#{thegenreofsinger}") %>
+      <% singer_intro = eval(thesingerintro) %>
+      <% worksheet.insert_cell(rows, 7, "#{singer_intro[index]}") %>
+      <% workbook.write(path) %>
+    <% end %>
+
+  <% elsif info ==  "AlbumInfo" %>
+    <% FileUtils.cp("tmp/AlbumInfo.xlsx", path) %>
+    <% album_count.each do |k,v| %>
+      <% if k == thealbum %>
+        <% workbook = RubyXL::Parser.parse(path) %>
+        <% worksheet = workbook.worksheets[0] %>
+        <% worksheet.insert_cell(2, 0, "#{thealbum}") %>
+        <% worksheet.insert_cell(2, 1, "#{thesinger}") %>
+        <% worksheet.insert_cell(2, 2, "#{theoriginofsinger}") %>
+        <% worksheet.insert_cell(2, 3, "#{v}") %>
+        <% worksheet.insert_cell(2, 4, "#{thereleasetimeofalbum}") %>
+        <% worksheet.insert_cell(2, 5, "#{thereleasecompanyofalbum}") %>
+        <% worksheet.insert_cell(2, 6, "#{thealbumcomposition}") %>
+        <% worksheet.insert_cell(2, 7, "#{thealbumtype}") %>
+        <% worksheet.insert_cell(2, 8, "#{thelanguage}") %>
+        <% worksheet.insert_cell(2, 9, "#{thegenreofsong}") %>
+        <% worksheet.insert_cell(2, 10, "#{thealbumintro}") %>
+        <% workbook.write(path) %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<table class="table table-striped">
+  <tr><th><h3>Singer Image</h3></th></tr>
+  <tr><td>
+      <% uniqSinger.uniq.each do |singer| %>
+        <h4><%= original_singer_name = singer["singer_name"] %></h4>
+        <% imgName = original_singer_name.gsub(" ","")%>
+        <% singer_imglink = singer["image_singer"] %>
+        <%= image_tag "#{singer_imglink}", width: "125px", height: "125px", class: "img-thumbnail" %><br>
+        <% downloadimage("Singer",singer_imglink,imgName,original_singer_name) %>
+        <%= singer_imglink %>
+        <% excelPath =  "#{$directory_info}/#{original_singer_name}.xlsx" %>
+        <% generateExcelFiles("SingerInfo",excelPath,singer) %><hr>
+      <% end %>
+    </td></tr>
+</table>
+
+<table class="table table-striped">
+  <tr><th><h3>Multiple Singer Image</h3></th></tr>
+  <tr><td>
+      <% uniqMultipleSinger.uniq.each do |multisinger| %>
+        <% multi_singer_name = multisinger["singer_name"] %>
+        <% imgName = [] %>
+        <% imgName = multi_singer_name.split("&")%>
+        <% imgName.each_with_index do |img,index| %>
+          <h4><%= img %></h4>
+          <% imgName = img.gsub(" ","")%>
+          <% singer_imglink = multisinger["image_singer"] %>
+          <% singer_imglink.gsub!(/[”“]/, '"') %>
+          <% singer_imglink.gsub!(/[‘’]/, "'") %>
+          <% singer = eval(singer_imglink) %>
+          <%= image_tag "#{singer[index]}", width: "125px", height: "125px", class: "img-thumbnail" %><br>
+          <% downloadimage("Singer",singer[index],imgName,img) %>
+          <%= singer[index] %>
+        <% end %>
+        <% excelPath =  "#{$directory_info}/#{multi_singer_name}.xlsx" %>
+        <% generateExcelFiles("MultipleSingerInfo",excelPath,multisinger) %><hr>
+      <% end %>
+    </td></tr>
+</table>
+
+<table class="table table-striped">
+  <tr><th><h3>Album Image</h3></th></tr>
+  <tr><td>
+      <% uniqAlbum.uniq.each do |album| %>
+        <h4><%= original_album_Name = album["album_name"] %></h4>
+            <% imgName = original_album_Name.gsub(" ","")%>
+            <% album_imglink = album["image_album"] %>
+            <%= image_tag "#{album_imglink}", width: "125px", height: "125px", class: "img-thumbnail" %><br>
+            <%= album_imglink %>
+            <% downloadimage("Album",album_imglink,imgName,original_album_Name) %>
+            <% excelPath =  "#{$directory_info}/#{original_album_Name}.xlsx" %>
+            <% generateExcelFiles("AlbumInfo",excelPath,album) %><hr>
+      <% end %>
+    </td></tr>
+</table>

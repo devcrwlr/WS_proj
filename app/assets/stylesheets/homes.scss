@@ -1,0 +1,11 @@
+// Place all the styles related to the Homes controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+@import "bootstrap-sprockets";
+@import "bootstrap";
+
+.navbar-nav > li > a {
+    padding-top: 30px;
+    padding-bottom: 30px;
+    margin-left: 90px;
+ }

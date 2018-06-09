@@ -1,0 +1,88 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Tracks</h1>
+
+<% if File.exists? "_wesing/mp4.sh" %>
+  <% FileUtils.rm("_wesing/mp4.sh") %>
+<% end %>
+<% if File.exists? "_wesing/mp3.sh" %>
+  <% FileUtils.rm("_wesing/mp3.sh") %>
+<% end %>
+<% if File.exists? "_wesing/karaoke.sh" %>
+  <% FileUtils.rm("_wesing/karaoke.sh") %>
+<% end %>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th><h4><b>Songname</b></h4></th>
+       <th><h4><b>Singername</b></h4></th>
+       <th><h4><b>Mp3</b></h4></th>
+       <th><h4><b>Mp4</b></h4></th>
+       <th><h4><b>Karaoke</b></h4></th>
+    </tr>
+  </thead>
+
+  <tbody>
+  <% if $songandsingerlist != nil %>
+    <% $songandsingerlist.each do |songandsinger| %>
+
+        <% thecounter =  songandsinger["counter"] %>
+        <% thesong =  songandsinger["song_name"] %>
+        <% thesinger = songandsinger["singer_name"] %>
+        <% thealbum = songandsinger["album_name"] %>
+        <% thelanguage = songandsinger["language"] %>
+        <% thelyrics = songandsinger["lyrics"] %>
+        <% thelyrics = songandsinger["lyrics"] %>
+        <% themp3 = songandsinger["mp3"] %>
+        <% themp4 = songandsinger["mp4"] %>
+        <% thekaraoke = songandsinger["karaoke"] %>
+
+        <% if thecounter == nil %>
+            <% counter = " " %>
+        <% elsif thecounter <= 9  %>
+            <% counter = "0#{thecounter}" %>
+        <% else %>
+            <% counter = "#{thecounter}" %>
+        <% end %>
+
+      <tr>
+        <td><% thecounter %></td>
+        <td nowrap><%= thesong %></td>
+        <td nowrap><%= thesinger%></td>
+
+        <% if themp3 == "N/A" || themp3 == nil %>
+            <td><%=  "#{themp3}" %></td>
+        <% else %>
+            <td><%= themp3 %></td>
+
+            <% File.open("_wesing/mp3.sh","a+") { |f| f.puts("youtube-dl -f bestaudio --extract-audio --audio-quality 320 --audio-format mp3 -o \"#{$subdirectory_track}/#{thesong} - #{thesinger} - #{thelanguage}.%(ext)s\" " + themp3) } %>
+
+        <% end %>
+
+        <% if themp4 == "N/A" || themp4 == nil %>
+          <td><%= "#{themp4}" %></td>
+        <% else %>
+           <td><%= themp4 %></td>
+
+            <% File.open("_wesing/mp4.sh","a+") { |f| f.puts("youtube-dl -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio' --merge-output-format mp4 -o \"#{$subdirectory_track}/#{thesong} - #{thesinger} - MV.%(ext)s\" " + themp4) } %>
+
+        <% end %>
+
+        <% if thekaraoke == "N/A" || thekaraoke == nil %>
+          <td><%= "N/A" %></td>
+        <% else %>
+          <td><%= "#{thekaraoke}" %></td>
+
+            <% File.open("_wesing/karaoke.sh","a+") { |f| f.puts("youtube-dl -f bestaudio --extract-audio --audio-quality 320 --audio-format mp3 -o \"#{$subdirectory_track}/#{thesong} - #{thesinger} - #{thelanguage} - Karaoke.%(ext)s\" " + thekaraoke) } %>
+
+        <% end %>
+
+      </tr>
+    <% end %>
+    <% end %>
+  </tbody>
+</table>
+
+<br>

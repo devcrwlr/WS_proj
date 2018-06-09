@@ -1,0 +1,19 @@
+<nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/">
+      	wesing CRAWLER
+      </a>
+
+      <% if request.original_url.include? 'lyrics' %> 
+      <p class="navbar-text navbar-right"><a href="/lyrics" class="navbar-link">Lyrics</a></p>
+      <p class="navbar-text navbar-right"><% link_to "Mp3" new_mp3s_path,  class: "navbar-link" %></p>
+      <p class="navbar-text navbar-right"><a href="/mp4s" class="navbar-link">Mp4</a></p>
+      <% elsif request.original_url == request.base_url+"/" %>
+       <p class="navbar-text navbar-right"><a href="/lyrics" class="navbar-link">Lyrics</a></p>
+      <p class="navbar-text navbar-right"><a href="/mp3s/new" class="navbar-link">Mp3</a></p>
+      <p class="navbar-text navbar-right"><a href="/mp4s/new" class="navbar-link">Mp4</a></p>
+      <% end %>
+    </div>
+  </div>
+</nav>

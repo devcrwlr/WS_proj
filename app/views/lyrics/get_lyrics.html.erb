@@ -1,0 +1,88 @@
+
+
+<h1>Get Lyrics</h1>
+<h4><%= @countsongs %></h4>
+
+<table class="table table-striped">
+  <% if $songandsingerlist != nil %>
+  <% $songandsingerlist.each do |songandsinger| %>
+    <% require 'mechanize' %>
+
+    <% mechanize = Mechanize.new %>
+
+    <% $thecounter =  songandsinger["counter"] %>
+    <% $thesong =  songandsinger["song_name"] %>
+    <% $thesinger = songandsinger["singer_name"] %>
+    <% $thealbum = songandsinger["album_name"] %>
+    
+    <% urllyrics = "https://www.google.com.ph/search?source=hp&ei=po0SWrPlJ8Kj0QSy14CQBA&q="+"#{$thesong}#{$thesinger}"+"lyrics" %>
+        <% pagelyrics = mechanize.get(urllyrics) %>
+        <% lyricsurl = pagelyrics.css('h3.r a') %>
+  <tr>
+    <td>
+      <h3><%= "#{$thesong} - #{$thesinger}" %></h3>
+    </td>
+    <td>
+        <table class="table table-striped">
+          <% lyricsurl.each do |lyrics| %>
+          <tr>
+            <% splitlyrics = lyrics[:href] %>
+            <% replacelyrics = splitlyrics.split('&')[0] %>
+            <% url_lyrics = replacelyrics.gsub('/url?q=', '') %>
+
+             <% directory_name = "#{$thealbum} - #{$thesinger}" %>
+
+            <% if url_lyrics.include? "https://genius.com" %>
+
+            <% geniusurl = mechanize.get(url_lyrics) %>
+            <% lyricsurl = geniusurl.css('div.lyrics') %>
+            
+            <% if !$thealbum.blank? %>
+              <% out_file = File.new("_theLyrics/#{$thealbum} - #{$thesinger}/#{$thecounter} #{$thesong} - #{$thesinger}.txt", "w") %> 
+            <% else %>
+               <% out_file = File.new("_theLyrics/#{$thesong} - #{$thesinger}/#{$thecounter} #{$thesong} - #{$thesinger}.txt", "w") %>
+            <% end %>
+            <% out_file.puts("#{lyricsurl.text.strip}") %>
+            <% out_file.close %>
+                     
+             
+            <% elsif url_lyrics.include? "http://www.metrolyrics.com" %>
+              <% metrolyrics = mechanize.get(url_lyrics) %>
+              <% lyricsurl = metrolyrics.css('div#lyrics-body-text') %>
+               
+               <% if !$thealbum.blank? %>
+                <% out_file = File.new("_theLyrics/#{$thealbum} - #{$thesinger}/#{$thecounter} #{$thesong} - #{$thesinger}.txt", "w") %> 
+               <% else %>
+                <% out_file = File.new("_theLyrics/#{$thesong} - #{$thesinger}/#{$thecounter} #{$thesong} - #{$thesinger}.txt", "w") %>
+               <% end %>
+              <% out_file.puts("#{lyricsurl.text.strip}") %>
+              <% out_file.close %>  
+          
+            <% end %>
+
+
+            <td> <%= link_to url_lyrics, "#{url_lyrics}", :target => "_blank" %></td>
+          </tr>
+          <% end %>
+        </table>
+    </td>
+    <td>
+      
+    </td>
+  </tr>
+    <% end %>
+    <% end %>
+</table>
+
+  
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,385 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Images</h1>
+
+<% "#{$albumlist}" %>
+<% album_count = Hash.new(0) %>
+<% $albumlist.each do |v| %>
+<% album_count[v] += 1 %>
+<% end %>
+
+<table class="table table-striped">
+
+  <% if $songandsingerlist != nil %>
+
+      <% $songandsingerlist.each do |songandsinger| %>
+        <% theindex =  songandsinger["index"] %>
+        <% thecounter =  songandsinger["counter"] %>
+        <% thesong =  songandsinger["song_name"] %>
+        <% thesinger = songandsinger["singer_name"] %>
+        <% thealbum = songandsinger["album_name"] %>
+        <% thelanguage = songandsinger["language"] %>
+        <% theoriginofsinger = songandsinger["origin_of_singer"] %>
+        <% thereleasetimeofalbum = songandsinger["release_time_of_album"] %>
+        <% thereleasecompanyofalbum = songandsinger["release_company_of_album"] %>
+        <% thealbumtype = songandsinger["album_type"] %>
+        <% thealbumcomposition = songandsinger["album_composition"] %>
+        <% thegenreofsong = songandsinger["genre_of_song"] %>
+        <% thealbumintro = songandsinger["album_intro"] %>
+        <% thegenderofsinger = songandsinger["gender_of_singer"] %>
+        <% thebirthday = songandsinger["birthday"] %>
+        <% thedateofdeath = songandsinger["date_of_death"] %>
+        <% therecordlabelforsinger = songandsinger["record_label_for_singer"] %>
+        <% thegenreofsinger = songandsinger["genre_of_singer"] %>
+        <% thesingerintro = songandsinger["singer_intro"] %>
+        <% imageAlbum = songandsinger["image_album"] %>
+        <% imageSinger = songandsinger["image_singer"] %>
+        <% imageHash = {} %>
+
+        <% unless imageSinger == nil || imageSinger == "" %>
+          <% imageHash = {"singerImage" => thesinger +"!#!"+imageSinger} %>
+        <% else %>
+          <% imageSinger = "N/A" %>
+          <% imageHash = {"singerImage" => thesinger +"!#!"+imageSinger} %>
+        <% end %>
+
+                <% require 'mechanize' %>
+                <% require 'rubygems' %>
+                <% require 'ImageResize' %>
+                <% require 'fileutils' %>
+                <% require 'rubyXL' %>
+
+                <% mechanize = Mechanize.new %>
+
+                <% imgAlbumURL = "#{imageAlbum}" %>
+                <% imgSingerURL = "#{imageSinger}" %>
+
+                <% singername = "#{thesinger}" %>
+
+                <% imgName = singername.gsub(" ","") %>
+
+
+                <% if imgAlbumURL.include? " " %>
+                  <% imgAlbumURL = imgAlbumURL.gsub(" ","") %>
+                <% end %>
+
+                <% if imgSingerURL.include? " " %>
+                  <% imgSingerURL = imgSingerURL.gsub(" ","") %>
+                <% end %>
+
+                <%imgHash = [] %>
+                <%singerArr = [] %>
+                <%imgArr = [] %>
+                <% arr = []%>
+
+        <% if thecounter == nil %>
+            <% counter = " " %>
+        <% elsif thecounter <= 9 %>
+            <% counter = "0#{thecounter}" %>
+        <% else %>
+            <% counter = "#{thecounter}" %>
+         <% end %>
+
+        <% begin %>
+         <% if thealbum == "N/A" || thealbum == nil %>
+
+              <% if imgSingerURL == "N/A" || imgSingerURL == "" || imgSingerURL == nil %>
+                <tr>
+                   <td><div class="alert alert-danger" role="alert">
+
+                      <h3> <%=  " #{thealbum} #{thesinger}" %> </h3>
+                      <%= "Album Image #{imgAlbumURL}" %>
+                       </div>
+
+                       <% excelPath =  "#{$directory_info}/#{thesinger}/#{thesinger}.xlsx" %>
+                       <% FileUtils.cp("tmp/SingerInfo.xlsx", excelPath) %>
+
+
+                       <% workbook = RubyXL::Parser.parse(excelPath) %>
+                       <% worksheet = workbook.worksheets[0] %>
+                       <% worksheet.insert_cell(2, 0, "#{thesinger}") %>
+                       <% worksheet.insert_cell(2, 1, "#{thegenderofsinger}") %>
+                       <% worksheet.insert_cell(2, 2, "#{theoriginofsinger}") %>
+                       <% worksheet.insert_cell(2, 3, "#{thebirthday}") %>
+                       <% worksheet.insert_cell(2, 4, "#{thedateofdeath}") %>
+                       <% worksheet.insert_cell(2, 5, "#{therecordlabelforsinger}") %>
+                       <% worksheet.insert_cell(2, 6, "#{thegenreofsinger}") %>
+                       <% worksheet.insert_cell(2, 7, "#{thesingerintro}") %>
+                       <% workbook.write(excelPath) %>
+
+                   </td>
+                </tr>
+
+              <% else %>
+              <tr>
+                 <td>
+                    <h3><%= "#{thesong} - #{thesinger}" %></h3>
+                </td>
+                <td>
+                    <% excelPath =  "_wesing/wesingBatchDownload/single/#{thesong} - #{thesinger}/Info/#{thesinger}/#{thesinger}.xlsx" %>
+                    <% FileUtils.cp("tmp/SingerInfo.xlsx", excelPath) %>
+
+
+                    <% workbook = RubyXL::Parser.parse(excelPath) %>
+                    <% worksheet = workbook.worksheets[0] %>
+                    <% worksheet.insert_cell(2, 0, "#{thesinger}") %>
+                    <% worksheet.insert_cell(2, 1, "#{thegenderofsinger}") %>
+                    <% worksheet.insert_cell(2, 2, "#{theoriginofsinger}") %>
+                    <% worksheet.insert_cell(2, 3, "#{thebirthday}") %>
+                    <% worksheet.insert_cell(2, 4, "#{thedateofdeath}") %>
+                    <% worksheet.insert_cell(2, 5, "#{therecordlabelforsinger}") %>
+                    <% worksheet.insert_cell(2, 6, "#{thegenreofsinger}") %>
+                    <% worksheet.insert_cell(2, 7, "#{thesingerintro}") %>
+                    <% workbook.write(excelPath) %>
+
+                    <% imgHash = imageHash['singerImage'] %>
+                    <% imgHash = imageHash['singerImage'].split('!#!')%>
+
+                      <% if imgHash[1].include? "," %>
+                          <% imgArr = imgHash[1].split(",")%>
+                          <% imgArr.each_with_index do |img,index| %>
+
+                              <% mechanize.get(img).save "tmp/Singer#{imgName}#{index}.jpg" %>
+                              <% Image.resize("tmp/Singer#{imgName}#{index}.jpg","tmp/Singer#{thesinger}#{imgName}.jpg", 500, 500) %>
+                              <% if imgHash[0].include? "&" %>
+                                  <% singerArr = imgHash[0].split("&")%>
+                                      <% FileUtils.mv("tmp/Singer#{imgName}#{index}.jpg", "_wesing/wesingBatchDownload/single/#{thesong} - #{thesinger}/Info/#{thesinger}/#{singerArr[index]}.jpg") %>
+                              <% end %>
+
+                              <div class="media">
+                                  <div class="media-left media-middle">
+                                     <br><a href="#"><%= image_tag "#{img}", width: "125px", height: "125px" %></a><br>
+                                  </div>
+                              </div>
+                              <%= "#{img}" %><br>
+
+                          <% end %>
+                      <% end %>
+
+
+                     <% unless imgSingerURL.include? "," %>
+                      <% mechanize.get(imgSingerURL).save "tmp/Singer#{imgName}.jpg" %>
+                      <% Image.resize("tmp/Singer#{imgName}.jpg","tmp/Singer#{imgName}.jpg", 500, 500) %>
+                      <% FileUtils.mv("tmp/Singer#{imgName}.jpg", "_wesing/wesingBatchDownload/single/#{thesong} - #{thesinger}/Info/#{thesinger}/#{thesinger}.jpg") %>
+
+                      <div class="media">
+                          <div class="media-left media-middle">
+                            <a href="#"><%= image_tag "#{imgSingerURL}", width: "125px", height: "125px" %></a><br>
+                            <%= imgSingerURL %>
+                          </div>
+                      </div>
+
+                    <% end %>
+
+                </td>
+              <% end %>
+            </tr>
+
+        <% else %>
+
+            <% if imgAlbumURL == "N/A" || imgAlbumURL == nil || imgAlbumURL == "" %>
+              <tr>
+                 <td><div class="alert alert-danger" role="alert">
+
+                    <h3> <%=  " #{thealbum} #{thesinger}" %> </h3>
+                    <%= "Album Image #{imgAlbumURL}"%>
+                     </div>
+
+
+
+                     <% excelPath = "_wesing/wesingBatchDownload/album/#{thealbum} - #{thesinger}/Album Info/#{thealbum}.xlsx" %>
+
+                     <% FileUtils.cp("tmp/AlbumInfo.xlsx", excelPath) %>
+
+                     <% album_count.each do |k,v| %>
+                       <% if k == thealbum %>
+                         <% workbook = RubyXL::Parser.parse(excelPath) %>
+                         <% worksheet = workbook.worksheets[0] %>
+                         <% worksheet.insert_cell(2, 0, "#{thealbum}") %>
+                         <% worksheet.insert_cell(2, 1, "#{thesinger}") %>
+                         <% worksheet.insert_cell(2, 2, "#{theoriginofsinger}") %>
+                         <% worksheet.insert_cell(2, 3, "#{v}") %>
+                         <% worksheet.insert_cell(2, 4, "#{thereleasetimeofalbum}") %>
+                         <% worksheet.insert_cell(2, 5, "#{thereleasecompanyofalbum}") %>
+                         <% worksheet.insert_cell(2, 6, "#{thealbumcomposition}") %>
+                         <% worksheet.insert_cell(2, 7, "#{thealbumtype}") %>
+                         <% worksheet.insert_cell(2, 8, "#{thelanguage}") %>
+                         <% worksheet.insert_cell(2, 9, "#{thegenreofsong}") %>
+                         <% worksheet.insert_cell(2, 10, "#{thealbumintro}") %>
+                         <% workbook.write(excelPath) %>
+                     <% end %>
+                   <% end%>
+
+                 </td>
+              </tr>
+            <% else %>
+
+                <% unless File.exist? "_wesing/wesingBatchDownload/album/#{thealbum} - #{thesinger}/Album Info/#{thealbum}.jpg" %>
+
+                    <% excelPath = "_wesing/wesingBatchDownload/album/#{thealbum} - #{thesinger}/Album Info/#{thealbum}.xlsx" %>
+
+                    <% FileUtils.cp("tmp/AlbumInfo.xlsx", excelPath) %>
+                    <% album_count.each do |k,v| %>
+                      <% if k == thealbum %>
+                        <% workbook = RubyXL::Parser.parse(excelPath) %>
+                        <% worksheet = workbook.worksheets[0] %>
+                        <% worksheet.insert_cell(2, 0, "#{thealbum}") %>
+                        <% worksheet.insert_cell(2, 1, "#{thesinger}") %>
+                        <% worksheet.insert_cell(2, 2, "#{theoriginofsinger}") %>
+                        <% worksheet.insert_cell(2, 3, "#{v}") %>
+                        <% worksheet.insert_cell(2, 4, "#{thereleasetimeofalbum}") %>
+                        <% worksheet.insert_cell(2, 5, "#{thereleasecompanyofalbum}") %>
+                        <% worksheet.insert_cell(2, 6, "#{thealbumcomposition}") %>
+                        <% worksheet.insert_cell(2, 7, "#{thealbumtype}") %>
+                        <% worksheet.insert_cell(2, 8, "#{thelanguage}") %>
+                        <% worksheet.insert_cell(2, 9, "#{thegenreofsong}") %>
+                        <% worksheet.insert_cell(2, 10, "#{thealbumintro}") %>
+                        <% workbook.write(excelPath) %>
+                    <% end %>
+
+                  <% mechanize.get(imgAlbumURL).save "tmp/Album#{imgName}.jpg" %>
+                  <% Image.resize("tmp/Album#{imgName}.jpg","tmp/Album#{imgName}.jpg", 500, 500) %>
+                  <% FileUtils.mv("tmp/Album#{imgName}.jpg", "_wesing/wesingBatchDownload/album/#{thealbum} - #{thesinger}/Album Info/#{thealbum}.jpg") %>
+
+                  <tr>
+                  <td>
+                    <h3> <%=  "#{thealbum} ALBUM" %> </h3>
+                    <div class="media">
+                       <div class="media-left media-middle">
+                        <a href="#">
+                          <%= image_tag "#{imageAlbum}", width: "125px", height: "125px" %>
+                        </a><br>
+                        <%= "Album Image #{imageAlbum}" %>
+
+                       </div>
+                    </div>
+
+                  </td>
+                </tr>
+
+              <% end %>
+
+          <% end%>
+
+          <% end %>
+
+            <% if imgSingerURL == "" || imgSingerURL == "N/A" || imgSingerURL == nil %>
+                <tr>
+                  <td>
+                    <div class="alert alert-danger" role="alert">
+                      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                     <%= "Singer Image #{imgSingerURL}  " %>
+                     </div>
+
+
+
+                         <% excelPath =  "_wesing/wesingBatchDownload/album/#{thealbum} - #{thesinger}/Singer Info/#{thesinger}.xlsx" %>
+                         <% FileUtils.cp("tmp/SingerInfo.xlsx", excelPath) %>
+                         <% workbook = RubyXL::Parser.parse(excelPath) %>
+                         <% worksheet = workbook.worksheets[0] %>
+                         <% worksheet.insert_cell(2, 0, "#{thesinger}") %>
+                         <% worksheet.insert_cell(2, 1, "#{thegenderofsinger}") %>
+                         <% worksheet.insert_cell(2, 2, "#{theoriginofsinger}") %>
+                         <% worksheet.insert_cell(2, 3, "#{thebirthday}") %>
+                         <% worksheet.insert_cell(2, 4, "#{thedateofdeath}") %>
+                         <% worksheet.insert_cell(2, 5, "#{therecordlabelforsinger}") %>
+                         <% worksheet.insert_cell(2, 6, "#{thegenreofsinger}") %>
+                         <% worksheet.insert_cell(2, 7, "#{thesingerintro}") %>
+                         <% workbook.write(excelPath) %>
+
+
+                  </td>
+                </tr>
+              <% else %>
+              <tr>
+                <% unless File.exist? "_wesing/wesingBatchDownload/album/#{thealbum} - #{thesinger}/Singer Info/#{thesinger}.jpg" %>
+                  <td>
+                    <h3><%= "#{thealbum} ALBUM - #{thesinger} " %></h3>
+                  </td>
+                  <td>
+
+
+                      <% excelPath =  "_wesing/wesingBatchDownload/album/#{thealbum} - #{thesinger}/Singer Info/#{thesinger}.xlsx" %>
+                      <% FileUtils.cp("tmp/SingerInfo.xlsx", excelPath) %>
+                      <% workbook = RubyXL::Parser.parse(excelPath) %>
+                      <% worksheet = workbook.worksheets[0] %>
+                      <% worksheet.insert_cell(2, 0, "#{thesinger}") %>
+                      <% worksheet.insert_cell(2, 1, "#{thegenderofsinger}") %>
+                      <% worksheet.insert_cell(2, 2, "#{theoriginofsinger}") %>
+                      <% worksheet.insert_cell(2, 3, "#{thebirthday}") %>
+                      <% worksheet.insert_cell(2, 4, "#{thedateofdeath}") %>
+                      <% worksheet.insert_cell(2, 5, "#{therecordlabelforsinger}") %>
+                      <% worksheet.insert_cell(2, 6, "#{thegenreofsinger}") %>
+                      <% worksheet.insert_cell(2, 7, "#{thesingerintro}") %>
+                      <% workbook.write(excelPath) %>
+
+
+                      <% imgHash = imageHash['singerImage'] %>
+                      <% imgHash = imageHash['singerImage'].split('!#!')%>
+
+                        <% if imgHash[1].include? "," %>
+
+                          <% imgArr = imgHash[1].split(",")%>
+
+                          <% imgArr.each_with_index do |img,index| %>
+                              <% mechanize.get(img).save "tmp/Singer#{imgName}#{index}.jpg" %>
+                              <% Image.resize("tmp/Singer#{imgName}#{index}.jpg","tmp/Singer#{imgName}#{index}.jpg", 500, 500) %>
+                                <% if imgHash[0].include? "&" %>
+                                    <% singerArr = imgHash[0].split("&")%>
+                                        <% FileUtils.mv("tmp/Singer#{imgName}#{index}.jpg", "_wesing/wesingBatchDownload/album/#{thealbum} - #{thesinger}/Singer Info/#{singerArr[index]}.jpg") %>
+                                <% end %>
+
+                                <div class="media">
+                                    <div class="media-left media-middle">
+                                       <br><a href="#"><%= image_tag "#{img}", width: "125px", height: "125px" %></a><br>
+                                    </div>
+                                </div>
+                                <%= "#{img}" %><br>
+
+                          <% end %>
+
+                        <% end %>
+
+
+
+
+                    <% unless imgSingerURL.include? "," %>
+
+
+                              <% mechanize.get(imgSingerURL).save "tmp/Singer#{imgName}.jpg" %>
+                              <% Image.resize("tmp/Singer#{imgName}.jpg","tmp/Singer#{imgName}.jpg", 500, 500) %>
+                              <% FileUtils.mv("tmp/Singer#{imgName}.jpg", "_wesing/wesingBatchDownload/album/#{thealbum} - #{thesinger}/Singer Info/#{thesinger}.jpg") %>
+
+
+                                <h4> <br> </h4>
+                                <div class="media">
+                                   <div class="media-left media-middle">
+                                    <a href="#">
+                                      <%= image_tag "#{imageSinger}", width: "125px", height: "125px" %>
+                                    </a><br>
+                                     <%= "Singer Image #{imageSinger}" %>
+                                   </div>
+                                </div>
+
+
+                    <% end %>
+
+                    </td>
+                <% end %>
+
+
+
+
+              </tr>
+            <% end %>
+         <% end %>
+        <% rescue %>
+          <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span>
+            <%= "Unable to Download Images" %>
+          </div>
+        <% end %>
+    <% end %>
+  <% end %>
+</table>

@@ -1,0 +1,90 @@
+<p id="notice"><%= notice %></p>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Import Excel File</h3>
+  </div>
+  <div class="panel-body">
+   <%= form_tag import_songs_path, multipart: true do %>
+   <div class="field">
+      <%= file_field_tag :file %>
+    </div>
+    <%= submit_tag "Generate Folder", class: "btn btn-primary" %>
+    <% end %>
+</div>
+</div>
+
+<h1>List of Songs</h1>
+
+<h4><%= "#{$countsongs}" %></h4>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Songname </th>
+      <th>Singername</th>
+      <th>Album</th>
+      <th>Language</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% if $songandsingerlist != nil %>
+
+    <% $songandsingerlist.each do |song| %>
+      <tr>
+        <td><%= "#{song["counter"]}" %></td>
+        <td><%= "#{song["song_name"]}"    %></td>
+        <td><%= "#{song["singer_name"]}" %></td>
+        <td><%= "#{song["album_name"]}" %></td>
+        <td><%= "#{song["language"]}" %></td>
+      </tr>
+
+      <% require 'rubyXL' %>
+
+      <% excelPath = "_wesing/wesingBatchDownload/PH Delivery Total_#{$list_songs.size-3}_Songs_#{$time}.xlsx" %>
+
+      <% if !File.exist? (excelPath) %>
+        <% FileUtils.cp("tmp/Delivery.xlsx", excelPath) %>
+        <% workbook = RubyXL::Parser.parse(excelPath) %>
+        <% worksheet = workbook.worksheets[0] %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 0, "#{song["index"]}".to_i - 2) %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 1, "#{song["song_name"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 2, "#{song["singer_name"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 3, "#{song["name_of_package"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 4, "#{song["language"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 5, "#{song["version"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 6, "#{song["instrument_type"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 7, "#{song["movie_tv"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 8, "#{song["type"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 9, "#{song["album_name"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 10, "#{song["operator_name"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 11, "#{song["origin_of_singer"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 12, "#{song["date_of_delivery"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 13, "#{song["note"]}") %>
+
+
+        <% workbook.write(excelPath) %>
+      <% else %>
+        <% workbook = RubyXL::Parser.parse(excelPath) %>
+        <% worksheet = workbook.worksheets[0] %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 0, "#{song["index"]}".to_i - 2) %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 1, "#{song["song_name"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 2, "#{song["singer_name"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 3, "#{song["name_of_package"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 4, "#{song["language"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 5, "#{song["version"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 6, "#{song["instrument_type"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 7, "#{song["movie_tv"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 8, "#{song["type"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 9, "#{song["album_name"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 10, "#{song["operator_name"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 11, "#{song["origin_of_singer"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 12, "#{song["date_of_delivery"]}") %>
+        <% worksheet.insert_cell("#{song["index"]}".to_i, 13, "#{song["note"]}") %>
+        <% workbook.write(excelPath) %>
+      <% end %>
+      <% end %>
+    <% end %>
+  </tbody>
+</table>

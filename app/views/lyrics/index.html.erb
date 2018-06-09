@@ -1,0 +1,440 @@
+<h1> LYRICS </h1>
+
+<table class="table table-striped">
+
+    <% if $songandsingerlist != nil %>
+
+      <% $songandsingerlist.each do |songandsinger| %>
+
+        <% thecounter =  songandsinger["counter"] %>
+        <% thesong =  songandsinger["song_name"] %>
+        <% thesinger = songandsinger["singer_name"] %>
+        <% thealbum = songandsinger["album_name"] %>
+        <% thelanguage = songandsinger["language"] %>
+        <% thelyrics = songandsinger["lyrics"] %>
+        <% themp3 = songandsinger["mp3"] %>
+        <% themp4 = songandsinger["mp4"] %>
+        <% thekaraoke = songandsinger["karaoke"] %>
+
+        <% if thecounter == nil %>
+            <% counter = " " %>
+        <% elsif thecounter <= 9  %>
+            <% counter = "0#{thecounter}" %>
+        <% else %>
+            <% counter = "#{thecounter}" %>
+        <% end %>
+
+            <% if thelyrics == "N/A" || thelyrics == nil %>
+              <!-- A R R A Y WITH B L A N K -->
+               <tr>
+                <td><div class="alert alert-danger" role="alert">
+                   <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                   <span class="sr-only">Error:</span>
+                    </div>
+                </td>
+                <td>
+                  <div class="alert alert-danger" role="alert">
+                    <%= "#{thesong} #{thesinger}" %>
+                  </div>
+                </td>
+              </tr>
+
+            <% else %>
+
+
+              <tr>
+                <td nowrap>
+                  <strong><%= "#{thesong} #{thesinger}" %></strong>
+                </td>
+
+                <td>
+
+                  <% require 'mechanize' %>
+                  <% require 'open-uri' %>
+                  <% require 'rubygems' %>
+                  <% require 'nokogiri' %>
+
+                  <% if thelyrics.include? " " %>
+                    <% thelyrics = thelyrics.gsub(" ","") %>
+                  <% end %>
+
+                  <% mechanize = Mechanize.new %>
+                <% begin %>
+
+                  <% if thelyrics.include? "lyricsmode.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.inner-song-page-content p#lyrics_text') %>
+
+                  <% elsif thelyrics.include? "lyricsfreak.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div#content_h') %>
+
+                  <% elsif thelyrics.include? "azlyrics.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.text-center div')[7] %>
+
+                  <% elsif thelyrics.include? "genius.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.lyrics p') %>
+
+                  <% elsif thelyrics.include? "metrolyrics.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div#lyrics-body-text p.verse') %>
+
+                  <% elsif thelyrics.include? "songlyrics.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div#songLyricsDiv-outer p#songLyricsDiv') %>
+
+                  <% elsif thelyrics.include? "musixmatch.com" %>
+                      <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                      <% lyricscontent = pagelyrics.css('div.mxm-lyrics p.mxm-lyrics__content') %>
+
+                  <% elsif thelyrics.include? "lyrics.az" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div p.lyric-text') %>
+
+                  <% elsif thelyrics.include? "unilyrics.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.entry-content p') %>
+
+                  <% elsif thelyrics.include? "videokeman.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.art-post-inner p') %>
+
+                  <% elsif thelyrics.include? "gugalyrics.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.content') %>
+
+                  <% elsif thelyrics.include? "azlyricdb.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div#lrc') %>
+
+                  <% elsif thelyrics.include? "stlyrics.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.main-text') %>
+
+                  <% elsif thelyrics.include? "elyrics.net" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div#inlyr') %>
+
+                  <% elsif thelyrics.include? "lyricspinas.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.post-body') %>
+
+                  <% elsif thelyrics.include? "smule.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.lyrics p') %>
+
+                  <% elsif thelyrics.include? "opmtunes.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('pre') %>
+                    <% lyricscontent.search('span.c1').each do |sp| %>
+                      <% sp.remove %>
+                    <% end %>
+                    <% lyricscontent.search('span.c2').each do |sp| %>
+                      <% sp.remove %>
+                    <% end %>
+
+                  <% elsif thelyrics.include? "exposedlyrics.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.entry-content') %>
+
+                  <% elsif thelyrics.include? "rebelpixel.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.entry') %>
+
+
+                  <% elsif thelyrics.include? "lyricsera.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.lyric') %>
+
+                  <% elsif thelyrics.include? "mojim.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.fsZ dl.fsZx1') %>
+
+                  <% elsif thelyrics.include? "lyricsroot.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.texts p') %>
+
+                  <% elsif thelyrics.include? "lyricsreg.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('section#maincontent div') %>
+                    <% lyricscontent = lyricscontent.at_css('[style="text-align:center"]') %>
+                    <% lyricscontent.search('h2.content-subhead').remove %>
+                    <% lyricscontent.search('div.lyrics_above_ad').remove%>
+                    <% lyricscontent.search('div.below_lyrics_ad').remove %>
+                    <% lyricscontent.search('div.lyrics_below_ad2').remove %>
+                    <% lyricscontent.search('a.pure-button').remove %>
+
+                   <% elsif thelyrics.include? "lyrics.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('pre#lyric-body-text') %>
+
+                  <% elsif thelyrics.include? "lyricsprint.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.entry p') %>
+
+                   <% elsif thelyrics.include? "originalpinoylyrics.blogspot.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.post-body') %>
+                    <% lyricscontent.search('div.separator').remove %>
+
+                  <% elsif thelyrics.include? "flashlyrics.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.main-panel-coDEDEDntent span') %>
+
+                  <% elsif thelyrics.include? "tagaloglang.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.entry-content p') %>
+
+                  <% elsif thelyrics.include? "nitrolyrics.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.lyric p') %>
+
+                  <% elsif thelyrics.include? "justsomelyrics.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.content') %>
+                    <% lyricscontent.search('a').remove %>
+
+                  <% elsif thelyrics.include? "lyriczz.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.lyriczz') %>
+                    <% lyricscontent.search('a').remove %>
+                    <% lyricscontent.search('script').remove %>
+
+                  <% elsif thelyrics.include? "lyrics.wikia.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.lyricbox') %>
+
+                  <% elsif thelyrics.include? "liryko.blogspot.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.post-body div')[5] %>
+
+                  <% elsif thelyrics.include? "lyricsok.blogspot.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.post-body div div') %>
+                    <% lyricscontent.search('a').remove %>
+                    <% lyricscontent.search('h1').remove %>
+
+                  <% elsif thelyrics.include? "allthelyrics.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.content-text-inner p') %>
+
+                  <% elsif thelyrics.include? "pinoylyrics.net" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.col-md-6 p') %>
+
+                  <% elsif thelyrics.include? "idatekira.blogspot.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.post-body div') %>
+
+                  <% elsif thelyrics.include? "citilyrics.blogspot.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.post-body') %>
+                    <% lyricscontent.search('a').remove %>
+                    <% lyricscontent.search('u').remove %>
+                    <% lyricscontent.search('div.box-admin').remove %>
+
+                  <% elsif thelyrics.include? "testicanzoni.mtv.it" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.testo p') %>
+                    <% lyricscontent.search('a').remove %>
+                    <% lyricscontent = lyricscontent.to_s.gsub("</p>","") %>
+                    <% lyricscontent = lyricscontent.to_s.gsub("<p>","\n") %>
+
+                  <% elsif thelyrics.include? "letssingit.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.contentbox') %>
+
+                  <% elsif thelyrics.include? "kantangnoypi.blogspot.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.post-body div') %>
+                    <% lyricContent = lyricscontent.search('[style="text-align: center;"]') %>
+                    <% lyricscontent.search('span').remove %>
+
+                  <% elsif thelyrics.include? "chordie.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div#firstcol div') %>
+                    <% lyricscontent.search('span.relc').remove %>
+                    <% lyricscontent.search('span.bracket').remove %>
+                    <% lyricscontent.search('span.inlc').remove %>
+                    <% lyricscontent = lyricscontent.to_s.gsub("</div>","") %>
+                    <% lyricscontent = lyricscontent.to_s.gsub("<div class=\"textline\">","\n") %>
+                    <% lyricscontent = lyricscontent.to_s.gsub("<div class=\"chordline\">","\n") %>
+
+                  <% elsif thelyrics.include? "lyricsmint.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div#lyric p') %>
+
+                  <% elsif thelyrics.include? "indicine.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.entry-content p') %>
+
+                  <% elsif thelyrics.include? "lyricsted.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.lyric-content p') %>
+
+                  <% elsif thelyrics.include? "lyricsoye.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('article.lyrics-content-box') %>
+
+                  <% elsif thelyrics.include? "lyricsmasti.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.col-md-7 code') %>
+
+                  <% elsif thelyrics.include? "lyricsraag.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.su-column-inner p') %>
+
+                  <% elsif thelyrics.include? "lyricstashan.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.col-xs-6') %>
+                    <% lyricscontent.search('div.pin-wrapper').remove %>
+
+                  <% elsif thelyrics.include? "sujiwotejo.com/" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.post-entry') %>
+
+                  <% elsif thelyrics.include? "laguaz.net" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div#lyrics-tab div.fn-container') %>
+
+                  <% elsif thelyrics.include? "everyshalalala.wordpress.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.entry-content p') %>
+                    <% lyricscontent = lyricscontent.to_s.gsub("<em>","\n") %>
+                    <% lyricscontent = lyricscontent.to_s.gsub("</em>","\n") %>
+                    <% lyricscontent = lyricscontent.to_s.gsub("<strong>","\n") %>
+                    <% lyricscontent = lyricscontent.to_s.gsub("</strong>","\n") %>
+
+                  <% elsif thelyrics.include? "lirikindieindonesia.blogspot.co.id" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.post-body div') %>
+
+                  <% elsif thelyrics.include? "lirik.web.id" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.entry-content p') %>
+
+                  <% elsif thelyrics.include? "tiotrina-trac.blogspot.co.id" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.post-body') %>
+
+                  <% elsif thelyrics.include? "meta-purnama.blogspot.co.id" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.post-body span') %>
+
+                  <% elsif thelyrics.include? "lirik.cc" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('span.disable-lyric p') %>
+
+                  <% elsif thelyrics.include? "songmeanings.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.lyric-box') %>
+                    <% lyricscontent.search('div a').remove %>
+
+                  <% elsif thelyrics.include? "musiklib.org" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div#song-lyric') %>
+                    <% lyricscontent.search('div.x-12').remove %>
+                    <% lyricscontent.search('div#song-other-lyrics').remove %>
+
+                  <% elsif thelyrics.include? "diliriklagu.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.entry-content') %>
+
+                  <% elsif thelyrics.include? "liriklaguxd.blogspot.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.post-body p') %>
+
+                  <% elsif thelyrics.include? "carapedia.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.generic-content') %>
+
+                  <% elsif thelyrics.include? "liriklagu.co.id" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.col-sm-8 div p') %>
+
+                  <% elsif thelyrics.include? "pandoraboxid.blogspot.co.id" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.post-body div') %>
+                    <% lyricscontent.search('div.postmeta a').remove %>
+
+                  <% elsif thelyrics.include? "kontenlirik.blogspot.co.id" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.post-body div') %>
+
+                  <% elsif thelyrics.include? "lyricxmusic.blogspot.co.id" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('article.post-outer-container div.post-outer div.post-content div.post-body-container div.post-body') %>
+
+                  <% elsif thelyrics.include? "lyricsmania.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.p402_premium') %>
+
+                  <% elsif thelyrics.include? "lyric.tkaraoke.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.div-content-lyric') %>
+
+                  <% elsif thelyrics.include? "mp3.zing.vn" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.fn-container p.fn-wlyrics') %>
+
+                  <% elsif thelyrics.include? "karahd.com" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.lyric div.entry-content p') %>
+
+                  <% elsif thelyrics.include? "keeng.vn" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.wrap-lyric-audio div.info-show p') %>
+
+                  <% elsif thelyrics.include? "hatkaraoke.vn" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.lyric p') %>
+
+                  <% elsif thelyrics.include? "nhac.vn" %>
+                    <% pagelyrics = Nokogiri::HTML(open(thelyrics, 'User-Agent' => 'firefox')) %>
+                    <% lyricscontent = pagelyrics.css('div.content_lyrics') %>
+                    <% lyricscontent.search('div a.btn-exp').remove %>
+
+                  <% else %>
+              				<% lyricscontent = thelyrics %>
+                  <% end %>
+                <% rescue %>
+                    <div class="alert alert-danger" role="alert">
+                      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                      <span class="sr-only">Error:</span>
+                      <%= "Unable to Download Lyrics" %>
+                    </div>
+                <% end %>
+
+
+
+
+
+
+                      <% File.open("#{$directory_lyrics}/#{thesong} - #{thesinger}.txt", "w:UTF-8") do |f|  %>
+                      <% f.write "#{thesong} - #{thesinger}" %>
+                      <% lyricstxt = lyricscontent.to_s.gsub("<br>","\n")%>
+                      <%= lyricstxt = Nokogiri::HTML(lyricstxt).text %>
+                      <% f.write "\n\n#{lyricstxt}" %>
+                      <%end %>
+
+                     <% File.open("#{$directory_lyrics}/#{thesong} - #{thesinger}.txt", "r:UTF-8") do |f|  %>
+                        <% f.read %>
+                      <% end %>
+
+
+
+
+
+
+                </td>
+
+
+              </tr>
+
+            <% end %>
+
+  <% end %>
+  <% end %>
+  </table>
